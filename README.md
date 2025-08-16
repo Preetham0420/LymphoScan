@@ -1,85 +1,31 @@
-# LymphoScan — Run Guide (HTML-first)
+# LymphoScan — How It Works
 
-LymphoScan is a lightweight **HTML/CSS/JS** UI for lymphoma image screening. The UI runs as a static site (open `index.html`). An **optional Flask backend** can be started to serve model predictions.
+LymphoScan pairs a simple **HTML/CSS/JS** interface with a **Flask** API and a fine-tuned **Swin Transformer** image classifier (PyTorch). The goal is fast lymphoma-type screening from a single uploaded image.
 
-> Implementation is based on a Swin Transformer + Flask workflow; this README focuses only on how to run the code.
+## End-to-End Flow
+1. **User uploads an image** on the web UI (`index.html`). JavaScript (`scripts.js`) previews the image and sends it as `multipart/form-data` to the Flask endpoint **`/predict`** via `fetch()`.
+2. **Flask receives the file** (`app.py`), saves it under `static/uploads/`, opens it with **PIL**, and **preprocesses** it using torchvision transforms (resize / tensor conversion / ImageNet normalization).
+3. The **Swin model** (either `transformers.SwinForImageClassification` or the `SwinModel` defined in `model_architecture.py`) is loaded with **fine-tuned weights** and set to `eval()` on CPU/GPU.
+4. The preprocessed tensor is passed through the model. The **argmax** of the logits picks the predicted class index, which is mapped to a human-readable label (e.g., *Benign, Blood Cancer, CLL, Early, FL, MCL, Pre, Pro, Non-Cancer, Unknown*).
+5. Flask returns **JSON** (`{"prediction": "<label>"}`), and the frontend displays the result in the UI.
 
----
+## Data & Preprocessing
+- Training data is organized in **class-named folders** (e.g., `.../train/Benign`, `.../train/Blood_Cancer`, …).  
+- `preprocess.py` performs **data augmentation** to improve robustness (RGB conversion + brightness/contrast tweaks, geometric variations) and saves augmented images alongside originals.
+- During inference, images are normalized to ImageNet stats and resized/cropped to the Swin input size (224×224), matching training transforms.
 
-## Option A — Frontend Only (HTML)
-No installs required.
-1. Open `index.html` in your browser.
-2. Ensure `styles.css` and `scripts.js` are in the same folder as `index.html` (or update the paths inside `index.html`).
+## Model & Training
+- `model_architecture.py` defines a **Swin V2 Tiny** backbone (`torchvision.models.swin_v2_t`) with a custom **linear head** sized to the project’s class count.  
+- `train_model.py` fine-tunes a **SwinForImageClassification**/**Swin V2** model using cross-entropy loss and an optimizer with a learning-rate scheduler; **AMP (mixed precision)** is enabled for speed when CUDA is available.
+- `evaluate_model.py` reports **classification metrics** (precision/recall/F1) and a confusion matrix using scikit-learn to validate performance on a held-out set.
 
-This is enough for UI review/screenshots under an **HTML** category.
+## Prediction Script (CLI)
+- `Predict.py` loads the fine-tuned Swin weights and predicts a class for a single image given via command-line argument, mirroring the Flask `/predict` logic.
 
----
-
-## Option B — Frontend + Backend (Flask API)
-
-### Prerequisites
-- Python 3.9+
-- (Optional) Virtual environment
-  ```bash
-  python -m venv venv
-  # Windows
-  venv\Scripts\activate
-  # macOS/Linux
-  source venv/bin/activate
-  ```
-
-### Install Dependencies
-If the repo includes `requirements.txt`:
-```bash
-pip install -r requirements.txt
-```
-Otherwise, minimal install (adjust as needed):
-```bash
-pip install Flask transformers timm torch torchvision pillow numpy
-```
-
-### Model Weights
-- If `app.py` expects a local weights file, place it where the script looks (e.g., `weights/model.pth`) or edit the variable/path in `app.py`.
-- If the app downloads a model automatically, no action is needed.
-
-### Start the Backend
-```bash
-python app.py
-```
-By default the server runs at: **http://127.0.0.1:5000**
-
-### (Optional) Test the API directly
-```bash
-curl -X POST -F "file=@docs/In1.png" http://127.0.0.1:5000/predict
-```
-Replace `docs/In1.png` with any local test image.
-
-### Point the Frontend to the API
-If the UI makes fetch calls, set the base URL in `scripts.js` (for example):
-```js
-const API_URL = "http://127.0.0.1:5000";
-// fetch(`${API_URL}/predict`, { method: "POST", body: formData });
-```
-Then open `index.html` in your browser to use the end‑to‑end flow.
-
----
-
-## Project Layout
-```
-index.html
-styles.css
-scripts.js
-docs
-
-#backend
-app.py
-model_architecture.py
-preprocess.py
-Predict.py
-train_model.py
-evaluate_model.py
-check_dataset.py
-```
+## Frontend Details
+- `index.html` renders the layout (navigation, upload area, results section).  
+- `scripts.js` handles **file preview**, **reset**, and the **`/predict`** POST.  
+- `styles.css` provides a responsive look-and-feel.
 
 ## Screenshots in README
 ## Screenshots
@@ -87,9 +33,7 @@ check_dataset.py
 ![Screen 2](docs/In2.png)
 ![Screen 3](docs/In3.png)
 
----
+## What This Demonstrates
+- A clear separation of **UI**, **API**, and **ML** responsibilities.  
+- A practical transfer-learning setup where a modern transformer (Swin) is fine-tuned for **lymphoma image classification**, then served via a lightweight Flask endpoint and consumed by a browser-based UI.
 
-## Notes
-- For HTML‑only submissions, Option A is sufficient. Option B is for a working demo with predictions.
-- If ports/host differ, update them in both `app.py` and `scripts.js`.
-- Use a virtual environment to keep dependencies isolated.
