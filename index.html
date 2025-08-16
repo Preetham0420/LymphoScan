@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LymphoScan - AI Lymphoma Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+<!--  Navigation Bar -->
+<!-- 🔹 Navigation Bar -->
+<header class="navbar">
+    <div class="logo">
+        <img src="{{ url_for('static', filename='images/lymphoscan_logo.png') }}" alt="LymphoScan Logo" class="logo-img">
+        <span class="logo-text">LymphoScan</span>
+    </div>
+    <nav>
+        <a href="#">Home</a>
+        <a href="#">About</a>
+        <a href="#">Research</a>
+    </nav>
+</header>
+
+
+<!--  Hero Section -->
+<section class="hero">
+    <h1>Enhancing Lymphoma detection through Deep Learning</h1>
+    <p>Upload a medical image to receive an advanced analysis for accurate lymphoma detection.</p>
+</section>
+
+<!-- Two Containers Side by Side -->
+<section class="container">
+    <!-- Left Container: Upload Box + Image Preview -->
+    <div class="left-box">
+        <h2>Upload Image</h2>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <label for="fileInput" class="custom-file-upload">Choose File</label>
+            <input type="file" id="fileInput" accept="image/*">
+            <span id="fileName">No file chosen</span>
+        </form>
+        <div class="image-preview">
+            <img id="previewImage" class="hidden" alt="Uploaded Image Preview">
+        </div>
+        <!--  Choose Another Image Button (Initially Hidden) -->
+        <button id="resetButton" class="btn-secondary hidden">Choose Another Image</button>
+    </div>
+
+    <!-- Right Container: Predict Button + Short Description + Prediction Output -->
+    <div class="right-box">
+        <button type="submit" id="predictButton" class="btn-primary">Predict</button>
+        <p class="description">Utilizing deep learning techniques for accurate and efficient lymphoma detection.</p>
+        <div id="predictionOutput" class="prediction-box"></div>  <!-- 🔹 Prediction Result Box -->
+    </div>
+</section>
+
+<!--  How It Works Section -->
+<section class="how-it-works">
+    <h2>How It Works</h2>
+    <div class="steps-container">
+        <div class="step">
+            <img src="{{ url_for('static', filename='icons/UploadIcon.png') }}" alt="Upload Icon">
+            <p><strong>Step 1: Upload Image</strong><br>Choose the image you want to analyze.</p>
+        </div>
+        <div class="step">
+            <img src="{{ url_for('static', filename='icons/ProcessIcon.png') }}" alt="Predict Icon">
+            <p><strong>Step 2: Click on Predict</strong><br>Press the "Predict" button to analyze the image.</p>
+        </div>
+        <div class="step">
+            <img src="{{ url_for('static', filename='icons/Result.png') }}" alt="Process Icon">
+            <p><strong>Step 3: Get Prediction</strong><br>Get the results for your uploaded image.</p>
+        </div>
+    </div>
+</section>
+
+
+
+<!--  Footer -->
+<footer>
+    <p class="footer-bottom">© 2025 LymphoScan. All Rights Reserved.</p>
+</footer>
+
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
