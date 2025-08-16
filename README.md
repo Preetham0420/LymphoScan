@@ -27,7 +27,6 @@ LymphoScan pairs a simple **HTML/CSS/JS** interface with a **Flask** API and a f
 - `scripts.js` handles **file preview**, **reset**, and the **`/predict`** POST.  
 - `styles.css` provides a responsive look-and-feel.
 
-## Screenshots in README
 ## Screenshots
 ![Screen 1](docs/In1.png)
 ![Screen 2](docs/In2.png)
