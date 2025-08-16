@@ -64,13 +64,14 @@ Then open `index.html` in your browser to use the end‑to‑end flow.
 
 ---
 
-## Project Layout (example)
+## Project Layout
 ```
 index.html
 styles.css
 scripts.js
-docs/          # screenshots (e.g., In1.png, In2.png, In3.png)
-# optional backend
+docs
+
+#backend
 app.py
 model_architecture.py
 preprocess.py
@@ -80,14 +81,11 @@ evaluate_model.py
 check_dataset.py
 ```
 
-## Screenshots in README (optional)
-Add this block to your README to display images already in `docs/`:
-```markdown
+## Screenshots in README
 ## Screenshots
 ![Screen 1](docs/In1.png)
 ![Screen 2](docs/In2.png)
 ![Screen 3](docs/In3.png)
-```
 
 ---
 
